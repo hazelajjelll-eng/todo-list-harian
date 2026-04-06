@@ -19,24 +19,27 @@
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 350px;
+      width: 420px;
     }
     h2 {
       text-align: center;
     }
     input {
-      width: 70%;
       padding: 8px;
       border-radius: 6px;
       border: 1px solid #ccc;
+      margin-bottom: 8px;
+      width: 100%;
+      box-sizing: border-box;
     }
     button {
-      padding: 8px 10px;
+      padding: 6px 10px;
       border: none;
       border-radius: 6px;
       background: #4CAF50;
       color: white;
       cursor: pointer;
+      margin-left: 5px;
     }
     ul {
       list-style: none;
@@ -44,56 +47,117 @@
       margin-top: 15px;
     }
     li {
+      background: #f1f1f1;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+    }
+    .task-header {
       display: flex;
       justify-content: space-between;
-      background: #f1f1f1;
-      padding: 8px;
-      margin-bottom: 8px;
-      border-radius: 6px;
+      align-items: center;
     }
-    li.done {
+    .done {
       text-decoration: line-through;
       color: gray;
     }
+    .btn-group button {
+      background: #2196F3;
+    }
     .delete {
-      background: red;
+      background: red !important;
+    }
+    .date-text {
+      font-size: 12px;
+      color: #555;
+      margin-top: 4px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Todo List Harian</h2>
-    <input type="text" id="taskInput" placeholder="Tambah tugas...">
-    <button onclick="addTask()">Tambah</button>
+
+    <input type="text" id="taskInput" placeholder="Masukkan tugas...">
+    <input type="date" id="deadlineInput">
+    <button onclick="addTask()">Tambah Tugas</button>
+
     <ul id="taskList"></ul>
   </div>
 
   <script>
     function addTask() {
       const input = document.getElementById("taskInput");
+      const deadlineInput = document.getElementById("deadlineInput");
+
       const taskText = input.value.trim();
+      const deadline = deadlineInput.value;
 
       if (taskText === "") return;
 
       const li = document.createElement("li");
-      li.textContent = taskText;
 
-      li.onclick = function() {
-        li.classList.toggle("done");
+      // Header tugas
+      const header = document.createElement("div");
+      header.className = "task-header";
+
+      const span = document.createElement("span");
+      span.textContent = taskText;
+
+      span.onclick = function() {
+        span.classList.toggle("done");
       };
 
+      // Tombol edit
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "Edit";
+      editBtn.onclick = function() {
+        const newTask = prompt("Edit tugas:", span.textContent);
+        if (newTask !== null && newTask.trim() !== "") {
+          span.textContent = newTask;
+        }
+      };
+
+      // Tombol hapus
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "Hapus";
       deleteBtn.classList.add("delete");
-      deleteBtn.onclick = function(e) {
-        e.stopPropagation();
+      deleteBtn.onclick = function() {
         li.remove();
       };
 
-      li.appendChild(deleteBtn);
+      const btnGroup = document.createElement("div");
+      btnGroup.className = "btn-group";
+      btnGroup.appendChild(editBtn);
+      btnGroup.appendChild(deleteBtn);
+
+      header.appendChild(span);
+      header.appendChild(btnGroup);
+
+      li.appendChild(header);
+
+      // Tanggal dibuat
+      const createdDate = new Date().toLocaleDateString();
+      const createdText = document.createElement("div");
+      createdText.className = "date-text";
+      createdText.textContent = "Tanggal dibuat: " + createdDate;
+
+      li.appendChild(createdText);
+
+      // Deadline
+      if (deadline !== "") {
+        const deadlineText = document.createElement("div");
+        deadlineText.className = "date-text";
+        deadlineText.textContent = "Deadline: " + deadline;
+        li.appendChild(deadlineText);
+      }
+
       document.getElementById("taskList").appendChild(li);
 
       input.value = "";
+      deadlineInput.value = "";
     }
   </script>
 </body>
